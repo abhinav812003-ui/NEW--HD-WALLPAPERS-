@@ -5,79 +5,103 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GoldenFrame Wallpapers</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; background: #f8f8f8; color: #333; }
-    a { text-decoration: none; color: inherit; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: Arial,sans-serif; background:#f8f8f8; color:#333; }
+    a { text-decoration:none; color:inherit; }
+    header { background:#222; color:#fff; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; }
+    header h1 { font-size:20px; }
+    nav a { margin-left:15px; font-size:14px; }
+    .hero { text-align:center; padding:40px 20px; background:#4caf50; color:#fff; }
+    .hero h2 { font-size:28px; margin-bottom:10px; }
+    .hero p { font-size:16px; margin-bottom:20px; }
+    .hero button { padding:10px 20px; background:#fff; color:#4caf50; border:none; border-radius:5px; cursor:pointer; }
+    .categories { display:flex; flex-wrap:wrap; justify-content:center; padding:20px; gap:15px; }
+    .category { flex:1 1 120px; max-width:150px; text-align:center; cursor:pointer; }
+    .category img { width:100%; border-radius:5px; }
+    .gallery { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:15px; padding:20px; }
+    .gallery img { width:100%; border-radius:5px; cursor:pointer; transition:0.3s; }
+    .gallery img:hover { transform:scale(1.05); }
 
-    header { background: #222; color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-    header h1 { font-size: 20px; }
-    nav a { margin-left: 15px; font-size: 14px; }
+    /* Popup Styles */
+    .popup { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:999; }
+    .popup img { max-width:90%; max-height:80%; border-radius:5px; }
+    .popup button { margin-top:10px; padding:8px 15px; background:#4caf50; color:#fff; border:none; border-radius:5px; cursor:pointer; }
 
-    .hero { text-align: center; padding: 40px 20px; background: #4caf50; color: #fff; }
-    .hero h2 { font-size: 28px; margin-bottom: 10px; }
-    .hero p { font-size: 16px; margin-bottom: 20px; }
-    .hero button { padding: 10px 20px; background: #fff; color: #4caf50; border: none; border-radius: 5px; cursor: pointer; }
-
-    .categories { display: flex; flex-wrap: wrap; justify-content: center; padding: 20px; gap: 15px; }
-    .category { flex: 1 1 120px; max-width: 150px; text-align: center; cursor: pointer; }
-    .category img { width: 100%; border-radius: 5px; }
-
-    .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; padding: 20px; }
-    .gallery img { width: 100%; border-radius: 5px; cursor: pointer; }
-
-    footer { text-align: center; padding: 20px; background: #222; color: #fff; margin-top: 30px; font-size: 14px; }
+    footer { text-align:center; padding:20px; background:#222; color:#fff; margin-top:30px; font-size:14px; }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <header>
-    <h1>GoldenFrame Wallpapers</h1>
-    <nav>
-      <a href="#">Home</a>
-      <a href="#">Categories</a>
-      <a href="#">About</a>
-      <a href="#">Contact</a>
-    </nav>
-  </header>
+<!-- Header -->
+<header>
+  <h1>GoldenFrame Wallpapers</h1>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">Categories</a>
+    <a href="#">About</a>
+    <a href="#">Contact</a>
+  </nav>
+</header>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <h2>Free HD & 4K Wallpapers</h2>
-    <p>Download high-quality wallpapers for your mobile & desktop</p>
-    <button onclick="window.scrollTo({top:600, behavior:'smooth'})">Browse Wallpapers</button>
-  </section>
+<!-- Hero Section -->
+<section class="hero">
+  <h2>Free HD & 4K Wallpapers</h2>
+  <p>Download high-quality wallpapers for your mobile & desktop</p>
+  <button onclick="window.scrollTo({top:600, behavior:'smooth'})">Browse Wallpapers</button>
+</section>
 
-  <!-- Categories -->
-  <section class="categories">
-    <div class="category">
-      <img src="images/nature/photo1.jpg" alt="Nature">
-      <p>Nature</p>
-    </div>
-    <div class="category">
-      <img src="images/abstract/photo1.jpg" alt="Abstract">
-      <p>Abstract</p>
-    </div>
-    <div class="category">
-      <img src="images/4k/photo1.jpg" alt="4K">
-      <p>4K</p>
-    </div>
-  </section>
+<!-- Categories -->
+<section class="categories">
+  <div class="category">
+    <img src="images/nature/photo1.jpg" alt="Nature">
+    <p>Nature</p>
+  </div>
+  <div class="category">
+    <img src="images/abstract/photo1.jpg" alt="Abstract">
+    <p>Abstract</p>
+  </div>
+  <div class="category">
+    <img src="images/4k/photo1.jpg" alt="4K">
+    <p>4K</p>
+  </div>
+</section>
 
-  <!-- Gallery -->
-  <section class="gallery">
-    <img src="images/nature/photo1.jpg" alt="Wallpaper 1">
-    <img src="images/nature/photo2.jpg" alt="Wallpaper 2">
-    <img src="images/abstract/photo1.jpg" alt="Wallpaper 3">
-    <img src="images/abstract/photo2.jpg" alt="Wallpaper 4">
-    <img src="images/4k/photo1.jpg" alt="Wallpaper 5">
-    <img src="images/4k/photo2.jpg" alt="Wallpaper 6">
-  </section>
+<!-- Gallery -->
+<section class="gallery">
+  <img src="images/nature/photo1.jpg" alt="Wallpaper 1" onclick="openPopup(this)">
+  <img src="images/nature/photo2.jpg" alt="Wallpaper 2" onclick="openPopup(this)">
+  <img src="images/abstract/photo1.jpg" alt="Wallpaper 3" onclick="openPopup(this)">
+  <img src="images/abstract/photo2.jpg" alt="Wallpaper 4" onclick="openPopup(this)">
+  <img src="images/4k/photo1.jpg" alt="Wallpaper 5" onclick="openPopup(this)">
+  <img src="images/4k/photo2.jpg" alt="Wallpaper 6" onclick="openPopup(this)">
+</section>
 
-  <!-- Footer -->
-  <footer>
-    © 2026 GoldenFrame Wallpapers | Contact: example@email.com
-  </footer>
+<!-- Popup -->
+<div class="popup" id="popup">
+  <div style="text-align:center;">
+    <img id="popupImg" src="">
+    <br>
+    <a id="downloadBtn" href="" download><button>Download</button></a>
+    <button onclick="closePopup()">Close</button>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  © 2026 GoldenFrame Wallpapers | Contact: example@email.com
+</footer>
+
+<script>
+  // Popup function
+  function openPopup(img){
+    document.getElementById('popup').style.display = 'flex';
+    document.getElementById('popupImg').src = img.src;
+    document.getElementById('downloadBtn').href = img.src;
+  }
+  function closePopup(){
+    document.getElementById('popup').style.display = 'none';
+  }
+</script>
 
 </body>
 </html>
