@@ -1,41 +1,73 @@
-// Free wallpapers download
-document.querySelectorAll('.free-wallpaper').forEach(img => {
-    img.addEventListener('click', () => {
-        const imageSrc = img.getAttribute('src');
-        const link = document.createElement('a');
-        link.href = imageSrc;
-        link.download = imageSrc.split('/').pop();
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        alert('Wallpaper downloaded!');
-    });
+// 🔴 FIREBASE CONFIG (PASTE YOUR OWN)
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+  projectId: "YOUR_PROJECT",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "XXXX",
+  appId: "XXXX"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const storage = firebase.storage();
+const database = firebase.database();
+
+const gallery = document.getElementById("gallery");
+
+// Upload wallpaper
+function uploadPhoto() {
+  const file = document.getElementById("photoInput").files[0];
+  const status = document.getElementById("status");
+
+  if (!file) {
+    status.innerText = "Please select an image";
+    return;
+  }
+
+  const ref = storage.ref("wallpapers/" + Date.now() + "_" + file.name);
+  const task = ref.put(file);
+
+  status.innerText = "Uploading...";
+
+  task.on(
+    "state_changed",
+    null,
+    () => status.innerText = "Upload failed ❌",
+    () => {
+      task.snapshot.ref.getDownloadURL().then(url => {
+        database.ref("wallpapers").push({ url: url });
+        status.innerText = "Upload successful ✅";
+      });
+    }
+  );
+}
+
+// Load wallpapers
+database.ref("wallpapers").on("value", snapshot => {
+  if (!gallery) return;
+
+  gallery.innerHTML = "";
+  snapshot.forEach(child => {
+    const data = child.val();
+    const key = child.key;
+
+    gallery.innerHTML += `
+      <div class="card">
+        <img src="${data.url}">
+        <button onclick="deleteWallpaper('${key}','${data.url}')">Delete</button>
+      </div>
+    `;
+  });
 });
 
-// Premium wallpapers payment via Razorpay
-document.querySelectorAll('.premium-wallpaper').forEach(img => {
-    img.addEventListener('click', () => {
-        const options = {
-            "key": rzp_test_S3moPHj3QE7syA
-            "amount": 1000, // Amount in paisa (₹10)
-            "currency": "INR",
-            "name": "Wallpaper Hub",
-            "description": "Premium Wallpaper Purchase",
-            "handler": function (response){
-                alert("Payment successful! Payment ID: " + response.razorpay_payment_id);
-                // Payment success → download wallpaper
-                const link = document.createElement('a');
-                link.href = img.getAttribute('src');
-                link.download = img.getAttribute('src').split('/').pop();
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            },
-            "theme": {
-                "color": "#3399cc"
-            }
-        };
-        const rzp1 = new Razorpay(options);
-        rzp1.open();
-    });
-});
+// Delete wallpaper
+function deleteWallpaper(key, url) {
+  if (!confirm("Delete this wallpaper?")) return;
+
+  const ref = storage.refFromURL(url);
+  ref.delete().then(() => {
+    database.ref("wallpapers/" + key).remove();
+  });
+}
