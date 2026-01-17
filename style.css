@@ -1,54 +1,40 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f4f4;
-}
-
-header {
-  background: #111;
-  color: #fff;
-  padding: 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-nav a {
-  color: #fff;
-  margin-left: 15px;
-  text-decoration: none;
-}
-
-.upload {
-  padding: 20px;
-  background: #fff;
-  text-align: center;
-}
-
-button {
-  padding: 8px 15px;
-  cursor: pointer;
-}
+body { margin:0; font-family:Arial; background:#f2f2f2; }
+header { background:#111; color:#fff; padding:15px; display:flex; justify-content:space-between; }
+nav a { color:#fff; margin-left:15px; text-decoration:none; }
 
 .gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 15px;
-  padding: 20px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,200px);
+  gap:15px;
+  padding:20px;
 }
 
 .card {
-  background: #fff;
-  border-radius: 8px;
-  padding: 10px;
+  background:#fff;
+  padding:10px;
+  border-radius:8px;
+  text-align:center;
 }
 
 .card img {
-  width: 100%;
-  border-radius: 6px;
+  width:100%;
+  border-radius:6px;
 }
 
-.card button {
-  width: 100%;
-  margin-top: 5px;
+.lock {
+  filter:blur(4px);
+}
+
+.login-box {
+  width:300px;
+  margin:40px auto;
+  background:#fff;
+  padding:20px;
+  border-radius:8px;
+}
+
+.login-box input, button {
+  width:100%;
+  margin-top:10px;
+  padding:8px;
 }
