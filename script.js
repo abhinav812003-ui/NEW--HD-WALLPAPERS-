@@ -1,4 +1,6 @@
-// 🔴 FIREBASE CONFIG (PASTE YOUR OWN)
+/****************************
+ 🔥 FIREBASE CONFIG
+ ****************************/
 const firebaseConfig = {
   apiKey: rzp_test_S3moPHj3QE7syA
   authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -15,71 +17,118 @@ const auth = firebase.auth();
 const db = firebase.database();
 const storage = firebase.storage();
 
-/* ---------- LOGIN ---------- */
-function login(){
-  const email = email.value;
-  const password = password.value;
+/****************************
+ 🔐 AUTH STATE CHECK
+ ****************************/
+auth.onAuthStateChanged(user => {
+  const uploadBox = document.getElementById("uploadBox");
 
-  auth.signInWithEmailAndPassword(email, password)
-    .then(()=>loginStatus.innerText="Login success ✅")
-    .catch(err=>loginStatus.innerText=err.message);
-}
-
-/* ---------- ADMIN UPLOAD ---------- */
-auth.onAuthStateChanged(user=>{
-  if(user && user.email === "admin@gmail.com"){
-    document.getElementById("uploadBox")?.style.display="block";
+  if (uploadBox) {
+    if (user && user.email === "admin@gmail.com") {
+      uploadBox.style.display = "block"; // admin only
+    } else {
+      uploadBox.style.display = "none";
+    }
   }
 });
 
-function uploadWallpaper(){
-  const file = photoInput.files[0];
+/****************************
+ 🔑 LOGIN
+ ****************************/
+function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const status = document.getElementById("loginStatus");
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then(() => {
+      status.innerText = "Login successful ✅";
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 1000);
+    })
+    .catch(error => {
+      status.innerText = error.message;
+    });
+}
+
+/****************************
+ ⬆️ UPLOAD WALLPAPER (ADMIN)
+ ****************************/
+function uploadWallpaper() {
+  const fileInput = document.getElementById("photoInput");
   const type = document.getElementById("type").value;
   const price = document.getElementById("price").value || 0;
+  const status = document.getElementById("status");
 
-  const ref = storage.ref("wallpapers/"+Date.now()+"_"+file.name);
-  ref.put(file).then(snap=>{
-    snap.ref.getDownloadURL().then(url=>{
+  if (!fileInput.files[0]) {
+    status.innerText = "Please select an image ❌";
+    return;
+  }
+
+  const file = fileInput.files[0];
+  const filePath = "wallpapers/" + Date.now() + "_" + file.name;
+  const storageRef = storage.ref(filePath);
+
+  status.innerText = "Uploading... ⏳";
+
+  storageRef.put(file).then(snapshot => {
+    snapshot.ref.getDownloadURL().then(url => {
       db.ref("wallpapers").push({
-        url:url,
-        type:type,
-        price:price
+        url: url,
+        type: type,
+        price: price
       });
-      status.innerText="Uploaded ✅";
+      status.innerText = "Upload successful ✅";
+      fileInput.value = "";
     });
+  }).catch(err => {
+    status.innerText = "Upload failed ❌";
   });
 }
 
-/* ---------- LOAD WALLPAPERS ---------- */
-db.ref("wallpapers").on("value", snap=>{
+/****************************
+ 🖼️ LOAD WALLPAPERS
+ ****************************/
+db.ref("wallpapers").on("value", snapshot => {
+
   const gallery = document.getElementById("gallery");
   const premiumGallery = document.getElementById("premiumGallery");
 
-  if(gallery) gallery.innerHTML="";
-  if(premiumGallery) premiumGallery.innerHTML="";
+  if (gallery) gallery.innerHTML = "";
+  if (premiumGallery) premiumGallery.innerHTML = "";
 
-  snap.forEach(child=>{
-    const d = child.val();
+  snapshot.forEach(child => {
+    const data = child.val();
 
-    if(d.type==="free" && gallery){
-      gallery.innerHTML+=`
-      <div class="card">
-        <img src="${d.url}">
-        <a href="${d.url}" download>Download</a>
-      </div>`;
+    // FREE WALLPAPERS
+    if (data.type === "free" && gallery) {
+      gallery.innerHTML += `
+        <div class="card">
+          <img src="${data.url}">
+          <a href="${data.url}" download>Download</a>
+        </div>
+      `;
     }
 
-    if(d.type==="premium" && premiumGallery){
-      premiumGallery.innerHTML+=`
-      <div class="card">
-        <img src="${d.url}" class="lock">
-        <p>₹${d.price}</p>
-        <button onclick="buy()">Buy</button>
-      </div>`;
+    // PREMIUM WALLPAPERS
+    if (data.type === "premium" && premiumGallery) {
+      premiumGallery.innerHTML += `
+        <div class="card">
+          <img src="${data.url}" class="lock">
+          <p>₹${data.price}</p>
+          <button onclick="buyPremium()">Buy</button>
+        </div>
+      `;
     }
   });
 });
 
-function buy(){
-  alert("Pay via UPI\nupi-id@bank\nAfter payment admin will unlock");
+/****************************
+ 💰 BUY PREMIUM (UPI MANUAL)
+ ****************************/
+function buyPremium() {
+  alert(
+    "Pay via UPI\n\nUPI ID: yourupi@bank\nAmount as shown\n\nAfter payment, admin will unlock manually."
+  );
 }
