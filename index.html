@@ -1,133 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GoldenFrame Wallpapers</title>
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family: Arial,sans-serif; background:#f8f8f8; color:#333; }
-    a { text-decoration:none; color:inherit; }
-
-    /* ===== Header ===== */
-    header { background:#222; color:#fff; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; }
-    header h1 { font-size:20px; }
-    nav a { margin-left:15px; font-size:14px; }
-
-    /* ===== Hero ===== */
-    .hero { text-align:center; padding:40px 20px; background:#4caf50; color:#fff; }
-    .hero h2 { font-size:28px; margin-bottom:10px; }
-    .hero p { font-size:16px; margin-bottom:20px; }
-    .hero button { padding:10px 20px; background:#fff; color:#4caf50; border:none; border-radius:5px; cursor:pointer; }
-
-    /* ===== Categories ===== */
-    .categories { display:flex; flex-wrap:wrap; justify-content:center; padding:20px; gap:15px; }
-    .category { flex:1 1 120px; max-width:150px; text-align:center; cursor:pointer; }
-    .category img { width:100%; border-radius:5px; }
-
-    /* ===== Gallery ===== */
-    .gallery { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:15px; padding:20px; }
-    .gallery img { width:100%; border-radius:5px; cursor:pointer; transition:0.3s; }
-    .gallery img:hover { transform:scale(1.05); }
-
-    /* ===== Popup ===== */
-    .popup { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); justify-content:center; align-items:center; z-index:999; }
-    .popup-content { text-align:center; }
-    .popup img { max-width:90%; max-height:80%; border-radius:5px; }
-    .popup button { margin-top:10px; padding:8px 15px; background:#4caf50; color:#fff; border:none; border-radius:5px; cursor:pointer; }
-
-    /* ===== Download All Button ===== */
-    .download-all { text-align:center; margin:20px; }
-    .download-all a button { padding:10px 20px; background:#4caf50; color:#fff; border:none; border-radius:5px; cursor:pointer; }
-
-    /* ===== Footer ===== */
-    footer { text-align:center; padding:20px; background:#222; color:#fff; margin-top:30px; font-size:14px; }
-
-    /* ===== Responsive ===== */
-    @media(max-width:500px){
-      header { flex-direction:column; align-items:flex-start; }
-      nav { margin-top:10px; }
-    }
-  </style>
+    <title>Photo Upload</title>
 </head>
 <body>
 
-<!-- Header -->
-<header>
-  <h1>GoldenFrame Wallpapers</h1>
-  <nav>
-    <a href="#">Home</a>
-    <a href="#">Categories</a>
-    <a href="#">About</a>
-    <a href="#">Contact</a>
-  </nav>
-</header>
+<h2>Upload Photo</h2>
 
-<!-- Hero Section -->
-<section class="hero">
-  <h2>Free HD & 4K Wallpapers</h2>
-  <p>Download high-quality wallpapers for your mobile & desktop</p>
-  <button onclick="window.scrollTo({top:600, behavior:'smooth'})">Browse Wallpapers</button>
-</section>
+<input type="file" id="photoInput" accept="image/*">
+<br><br>
+<button onclick="uploadPhoto()">Upload</button>
 
-<!-- Download All Button -->
-<div class="download-all">
-  <a href="images/all_wallpapers.zip" download>
-    <button>Download All Wallpapers</button>
-  </a>
-</div>
+<p id="status"></p>
+<img id="preview" width="300">
 
-<!-- Categories -->
-<section class="categories">
-  <div class="category">
-    <img src="images/nature/photo1.jpg" alt="Nature">
-    <p>Nature</p>
-  </div>
-  <div class="category">
-    <img src="images/abstract/photo1.jpg" alt="Abstract">
-    <p>Abstract</p>
-  </div>
-  <div class="category">
-    <img src="images/4k/photo1.jpg" alt="4K">
-    <p>4K</p>
-  </div>
-</section>
-
-<!-- Gallery -->
-<section class="gallery">
-  <img src="images/nature/photo1.jpg" alt="Wallpaper 1" onclick="openPopup(this)">
-  <img src="images/nature/photo2.jpg" alt="Wallpaper 2" onclick="openPopup(this)">
-  <img src="images/abstract/photo1.jpg" alt="Wallpaper 3" onclick="openPopup(this)">
-  <img src="images/abstract/photo2.jpg" alt="Wallpaper 4" onclick="openPopup(this)">
-  <img src="images/4k/photo1.jpg" alt="Wallpaper 5" onclick="openPopup(this)">
-  <img src="images/4k/photo2.jpg" alt="Wallpaper 6" onclick="openPopup(this)">
-</section>
-
-<!-- Popup -->
-<div class="popup" id="popup">
-  <div class="popup-content">
-    <img id="popupImg" src="">
-    <br>
-    <a id="downloadBtn" href="" download><button>Download</button></a>
-    <button onclick="closePopup()">Close</button>
-  </div>
-</div>
-
-<!-- Footer -->
-<footer>
-  © 2026 GoldenFrame Wallpapers | Contact: example@email.com
-</footer>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
-  // Popup function
-  function openPopup(img){
-    document.getElementById('popup').style.display = 'flex';
-    document.getElementById('popupImg').src = img.src;
-    document.getElementById('downloadBtn').href = img.src;
-  }
-  function closePopup(){
-    document.getElementById('popup').style.display = 'none';
-  }
+/* 🔴 PASTE YOUR FIREBASE CONFIG HERE */
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "XXXX",
+  appId: "XXXX"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const storage = firebase.storage();
+
+function uploadPhoto() {
+    const fileInput = document.getElementById("photoInput");
+    const status = document.getElementById("status");
+    const preview = document.getElementById("preview");
+
+    const file = fileInput.files[0];
+
+    if (!file) {
+        status.innerText = "Please select an image first";
+        return;
+    }
+
+    const storageRef = storage.ref("uploads/" + Date.now() + "_" + file.name);
+    const uploadTask = storageRef.put(file);
+
+    status.innerText = "Uploading...";
+
+    uploadTask.on("state_changed",
+        function (snapshot) {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            status.innerText = "Uploading: " + Math.round(progress) + "%";
+        },
+        function (error) {
+            status.innerText = "Upload failed ❌";
+        },
+        function () {
+            uploadTask.snapshot.ref.getDownloadURL().then(function (url) {
+                status.innerText = "Upload successful ✅";
+                preview.src = url;
+            });
+        }
+    );
+}
 </script>
 
 </body>
