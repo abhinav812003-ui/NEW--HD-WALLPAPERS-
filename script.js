@@ -1,6 +1,6 @@
 // 🔴 FIREBASE CONFIG (PASTE YOUR OWN)
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
+  apiKey: rzp_test_S3moPHj3QE7syA
   authDomain: "YOUR_PROJECT.firebaseapp.com",
   databaseURL: "https://YOUR_PROJECT.firebaseio.com",
   projectId: "YOUR_PROJECT",
@@ -11,63 +11,75 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
+const auth = firebase.auth();
+const db = firebase.database();
 const storage = firebase.storage();
-const database = firebase.database();
 
-const gallery = document.getElementById("gallery");
+/* ---------- LOGIN ---------- */
+function login(){
+  const email = email.value;
+  const password = password.value;
 
-// Upload wallpaper
-function uploadPhoto() {
-  const file = document.getElementById("photoInput").files[0];
-  const status = document.getElementById("status");
-
-  if (!file) {
-    status.innerText = "Please select an image";
-    return;
-  }
-
-  const ref = storage.ref("wallpapers/" + Date.now() + "_" + file.name);
-  const task = ref.put(file);
-
-  status.innerText = "Uploading...";
-
-  task.on(
-    "state_changed",
-    null,
-    () => status.innerText = "Upload failed ❌",
-    () => {
-      task.snapshot.ref.getDownloadURL().then(url => {
-        database.ref("wallpapers").push({ url: url });
-        status.innerText = "Upload successful ✅";
-      });
-    }
-  );
+  auth.signInWithEmailAndPassword(email, password)
+    .then(()=>loginStatus.innerText="Login success ✅")
+    .catch(err=>loginStatus.innerText=err.message);
 }
 
-// Load wallpapers
-database.ref("wallpapers").on("value", snapshot => {
-  if (!gallery) return;
+/* ---------- ADMIN UPLOAD ---------- */
+auth.onAuthStateChanged(user=>{
+  if(user && user.email === "admin@gmail.com"){
+    document.getElementById("uploadBox")?.style.display="block";
+  }
+});
 
-  gallery.innerHTML = "";
-  snapshot.forEach(child => {
-    const data = child.val();
-    const key = child.key;
+function uploadWallpaper(){
+  const file = photoInput.files[0];
+  const type = document.getElementById("type").value;
+  const price = document.getElementById("price").value || 0;
 
-    gallery.innerHTML += `
+  const ref = storage.ref("wallpapers/"+Date.now()+"_"+file.name);
+  ref.put(file).then(snap=>{
+    snap.ref.getDownloadURL().then(url=>{
+      db.ref("wallpapers").push({
+        url:url,
+        type:type,
+        price:price
+      });
+      status.innerText="Uploaded ✅";
+    });
+  });
+}
+
+/* ---------- LOAD WALLPAPERS ---------- */
+db.ref("wallpapers").on("value", snap=>{
+  const gallery = document.getElementById("gallery");
+  const premiumGallery = document.getElementById("premiumGallery");
+
+  if(gallery) gallery.innerHTML="";
+  if(premiumGallery) premiumGallery.innerHTML="";
+
+  snap.forEach(child=>{
+    const d = child.val();
+
+    if(d.type==="free" && gallery){
+      gallery.innerHTML+=`
       <div class="card">
-        <img src="${data.url}">
-        <button onclick="deleteWallpaper('${key}','${data.url}')">Delete</button>
-      </div>
-    `;
+        <img src="${d.url}">
+        <a href="${d.url}" download>Download</a>
+      </div>`;
+    }
+
+    if(d.type==="premium" && premiumGallery){
+      premiumGallery.innerHTML+=`
+      <div class="card">
+        <img src="${d.url}" class="lock">
+        <p>₹${d.price}</p>
+        <button onclick="buy()">Buy</button>
+      </div>`;
+    }
   });
 });
 
-// Delete wallpaper
-function deleteWallpaper(key, url) {
-  if (!confirm("Delete this wallpaper?")) return;
-
-  const ref = storage.refFromURL(url);
-  ref.delete().then(() => {
-    database.ref("wallpapers/" + key).remove();
-  });
+function buy(){
+  alert("Pay via UPI\nupi-id@bank\nAfter payment admin will unlock");
 }
